@@ -1,30 +1,13 @@
-# React + TypeScript + Vite
+# Gym Buddy Frontend
+Gym Buddy Frontend is a TypeScript and React-based web application designed to serve as the user interface for managing gym operations. 
+It provides a seamless experience for gym members and staff, allowing them to interact with the Gym Buddy system efficiently.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Project Status
 
-Currently, two official plugins are available:
+Gym Buddy is a work in progress. While the core features such as user authentication and basic dashboard functionality are implemented, there is ongoing development to enhance the application with additional features and improve the user experience.
+The project has recently undergone a significant refactor, with the codebase being rewritten in TypeScript. This transition aims to leverage TypeScript's static typing and advanced tooling features to improve code quality, maintainability, and developer productivity.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Deployment Demo
 
-## Expanding the ESLint configuration
+A demo version of the Gym Buddy Frontend is available for preview. You can access the deployed demo [here](#https://jade-beijinho-9f67b9.netlify.app/).
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
