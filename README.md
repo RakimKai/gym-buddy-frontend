@@ -9,5 +9,5 @@ The project has recently undergone a significant refactor, with the codebase bei
 
 ## Deployment Demo
 
-A demo version of the Gym Buddy Frontend is available for preview. You can access the deployed demo [here](#https://jade-beijinho-9f67b9.netlify.app/).
+A demo version of the Gym Buddy Frontend is available for preview. You can access the deployed demo here : https://jade-beijinho-9f67b9.netlify.app/
 
