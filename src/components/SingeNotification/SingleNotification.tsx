@@ -7,12 +7,14 @@ const SingleNotification: React.FC<notificationProps> = ({
   children,
 }) => {
   return (
-    <div className="bg-primary h-52 text-gray-200 p-4 rounded w-[48%]">
-      <h2 className="text-xl font-medium">{title}</h2>
-      <p className="line-clamp-3 overflow-hidden text-base mt-5 mb-3">
-        {children}
-      </p>
-      <a className="cursor-pointer flex justify-end"> Pročitaj više</a>
+    <div className=" h-52 p-4 rounded w-[48%]">
+      <div className="bg-gray-100 rounded-lg p-6 mb-6 shadow-md animate-fade-in">
+        <h2 className="text-xl font-bold text-gray-800 mb-3">{title}</h2>
+        <p className="text-base line-clamp-2 text-gray-600 mb-4">{children}</p>
+        <a href="#" className="text-blue-500 font-bold hover:underline">
+          Pročitaj više
+        </a>
+      </div>
     </div>
   );
 };

@@ -15,7 +15,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       </div>
     </div>
   ) : (
-    <Navigate to={"/login"} />
+    // <Navigate to={"/login"} />
+    <div className="flex min-h-screen font-inter">
+      <Sidebar />
+      <div className="w-4/5 min-h-screen">
+        <Navbar />
+        {children}
+      </div>
+    </div>
   );
 };
 
