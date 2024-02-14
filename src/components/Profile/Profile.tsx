@@ -1,7 +1,42 @@
 import Button from "../Button/Button";
+import { useRef } from "react";
+import useAuth from "../../hooks/useContext";
+import { useMutation } from "react-query";
+import { editUser } from "../../data/auth/auth";
+import { EditUser } from "../../types/Types";
 
 const Profile = () => {
   const url = "../../public/profileImage.jpg";
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const dateRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const currentPasswordRef = useRef<HTMLInputElement>(null);
+  const newPasswordRef = useRef<HTMLInputElement>(null);
+
+  const { mutate: updateUser, isLoading: updateUserLoading } = useMutation(
+    editUser,
+    {
+      onSuccess() {
+        alert("gymra");
+      },
+    }
+  );
+
+  const { user, setUser } = useAuth();
+
+  const handleClick = async () => {
+    const editUser: EditUser = {
+      name: nameRef.current?.value,
+      email: emailRef.current?.value,
+      date_of_birth: dateRef.current?.value,
+      phone_number: phoneRef.current?.value,
+      current_password: currentPasswordRef.current?.value,
+      new_password: newPasswordRef.current?.value,
+    };
+    updateUser(editUser);
+  };
+  console.log(user);
   return (
     <div className="text-gray-700">
       <h2 className="text-2xl p-5">Postavke:</h2>
@@ -19,25 +54,31 @@ const Profile = () => {
           <div className="grid grid-cols-2 items-center">
             <label>Ime: </label>
             <input
+              ref={nameRef}
+              defaultValue={user?.name}
               type="text"
               className="w-[152px] outline-1 outline-gray-200 focus:outline-gray-200 px-3 py-2 border-2 border-gray-200 rounded"
-              placeholder="Ime..."
+              placeholder="Ime i prezime..."
             />
           </div>
           <div className="grid grid-cols-2 items-center">
-            <label>Prezime: </label>
+            <label>Email: </label>
             <input
+              ref={emailRef}
+              defaultValue={user?.email}
               type="text"
               className="w-[152px] outline-1 outline-gray-200 focus:outline-gray-200 px-3 py-2 border-2 border-gray-200 rounded"
-              placeholder="Prezime..."
+              placeholder="Email..."
             />
           </div>
           <div className="grid grid-cols-2 items-center">
-            <label>Spol: </label>
+            <label>Broj telefona: </label>
             <input
-              type="text"
+              ref={phoneRef}
+              defaultValue={user?.phone_number}
+              type="tel"
               className="w-[152px] outline-1 outline-gray-200 focus:outline-gray-200 px-3 py-2 border-2 border-gray-200 rounded"
-              placeholder="Spol..."
+              placeholder="Broj telefona..."
             />
           </div>
         </div>
@@ -45,23 +86,27 @@ const Profile = () => {
           <div className="grid grid-cols-2 items-center">
             <label>Datum rodjenja: </label>
             <input
+              ref={dateRef}
+              defaultValue={user?.date_of_birth}
               type="text"
               className="w-[152px] outline-1 outline-gray-200 focus:outline-gray-200 px-3 py-2 border-2 border-gray-200 rounded"
-              placeholder="Ime..."
+              placeholder="Datum rodjenja..."
             />
           </div>
           <div className="grid grid-cols-2 items-center">
             <label>Trenutna lozinka: </label>
             <input
-              type="text"
+              ref={currentPasswordRef}
+              type="password"
               className="w-[152px] outline-1 outline-gray-200 focus:outline-gray-200 px-3 py-2 border-2 border-gray-200 rounded"
-              placeholder="Prezime..."
+              placeholder="Trenutna lozinka..."
             />
           </div>
           <div className="grid grid-cols-2 items-center">
             <label>Nova lozinka: </label>
             <input
-              type="text"
+              ref={newPasswordRef}
+              type="password"
               className="w-[152px] outline-1 outline-gray-200 focus:outline-gray-200 px-3 py-2 border-2 border-gray-200 rounded"
               placeholder="Nova lozinka..."
             />
@@ -69,7 +114,11 @@ const Profile = () => {
         </div>
       </div>
       <div className="flex justify-end w-[75%] mx-auto">
-        <Button label="Sačuvaj" />
+        <Button
+          disabled={updateUserLoading}
+          label="Sačuvaj"
+          onClick={() => handleClick()}
+        />
       </div>
     </div>
   );

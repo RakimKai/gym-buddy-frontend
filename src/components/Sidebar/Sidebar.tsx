@@ -11,12 +11,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const handleClick = async () => {
     try {
-      var token =
-        localStorage.getItem("token") || sessionStorage.getItem("token");
-      const headers = {
-        Authorization: `Bearer ${token}`,
-      };
-      await axiosPrivate.post("/logout", {}, { headers: headers as any });
+      await axiosPrivate.post("/user/logout");
       navigate("/login");
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
@@ -82,10 +77,12 @@ const Sidebar = () => {
             </div>
             Postavke
           </NavLink>
-          <div onClick={handleClick} className="inline-block mt-3 mr-2">
-            <IconLogout />
+          <div onClick={handleClick} className="flex items-center mt-3 gap-x-2">
+            <div>
+              <IconLogout />
+            </div>
+            Odloguj se
           </div>
-          Odloguj se
         </div>
       </div>
     </nav>

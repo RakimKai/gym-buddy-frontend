@@ -5,7 +5,7 @@ import Input from "../Input/Input";
 import rootBG from "../../assets/rootBg.jpg";
 import { useNavigate } from "react-router-dom";
 import { axiosPrivate } from "../Axios/axios";
-import { LoginRequest } from "../../types/Types";
+import { LoginRequest } from "../../types/types";
 import { useRef, useState } from "react";
 
 const Login = () => {
@@ -20,7 +20,6 @@ const Login = () => {
       password: passwordRef.current?.value,
     };
     try {
-      console.log(loginData);
       const response = await axiosPrivate.post("/login", loginData);
       if (checkbox) {
         localStorage.setItem("token", response.data.data.token);
@@ -66,7 +65,7 @@ const Login = () => {
                 label="Registruj se"
                 variant="text"
                 type="button"
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/register")}
               />
             </div>
             <div>
