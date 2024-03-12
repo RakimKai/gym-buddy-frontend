@@ -4,32 +4,54 @@ import Checkbox from "../Checkbox/Checkbox";
 import Input from "../Input/Input";
 import rootBG from "../../assets/rootBg.jpg";
 import { useNavigate } from "react-router-dom";
-import { axiosPrivate } from "../Axios/axios";
 import { LoginRequest } from "../../types/types";
 import { useRef, useState } from "react";
+import { useMutation, useQuery } from "react-query";
+import { getUser, loginUser } from "../../data/auth/auth";
+import apiClient from "../Axios/axios";
+import { Bounce, ToastContainer, toast } from "react-toastify";
+import useAuth from "../../hooks/useContext";
 
 const Login = () => {
+  const { setUser, setIsEmployee } = useAuth();
+
   const navigate = useNavigate();
-  const [checkbox, setCheckBox] = useState<boolean>(false);
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
   const emailRef = useRef<HTMLInputElement>();
   const passwordRef = useRef<HTMLInputElement>();
+
+  const { refetch } = useQuery("profile", getUser, {
+    enabled: false,
+    onSuccess({ data }) {
+      setUser(data.data.user);
+      setIsEmployee(data.data.user.role === "Employee");
+
+      navigate("/dashboard/user/home");
+    },
+  });
+
+  const { mutate: login } = useMutation(loginUser, {
+    async onSuccess({ data }) {
+      apiClient.defaults.headers.common.Authorization =
+        "Bearer " + data.data.token;
+      if (rememberMe) {
+        localStorage.setItem("token", data.data.token);
+      } else {
+        sessionStorage.setItem("token", data.data.token);
+      }
+      await refetch();
+    },
+    onError() {
+      toast("Nevalidan email ili username");
+    },
+  });
 
   const handleClick = async () => {
     const loginData: LoginRequest = {
       email: emailRef.current?.value,
       password: passwordRef.current?.value,
     };
-    try {
-      const response = await axiosPrivate.post("/login", loginData);
-      if (checkbox) {
-        localStorage.setItem("token", response.data.data.token);
-      } else {
-        sessionStorage.setItem("token", response.data.data.token);
-      }
-      navigate("/dashboard/user/home");
-    } catch (err) {
-      console.log(err);
-    }
+    login(loginData);
   };
 
   return (
@@ -37,6 +59,20 @@ const Login = () => {
       className="h-screen bg-white flex items-center justify-center bg-cover bg-center"
       style={{ backgroundImage: `url(${rootBG})` }}
     >
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
+      <ToastContainer />
       <div className="flex h-auto w-full max-w-[34.75rem] flex-col rounded border border-gray-200 shadow-sm bg-white p-16">
         <div className="relative flex flex-col">
           <AuthHeader
@@ -58,8 +94,8 @@ const Login = () => {
                 id="rememberMe"
                 name="rememberMe"
                 label="Zapamti me"
-                handleChange={() => setCheckBox((prevState) => !prevState)}
-                checked={checkbox}
+                handleChange={() => setRememberMe((prevState) => !prevState)}
+                checked={rememberMe}
               />
               <Button
                 label="Registruj se"

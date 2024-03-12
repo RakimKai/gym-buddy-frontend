@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 
 type inputProps = {
   id?: string;
@@ -14,6 +14,8 @@ type inputProps = {
   type?: string;
   className?: string;
   inputRef?: any;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+  hidden?: boolean;
 };
 
 // eslint-disable-next-line react/display-name
@@ -30,6 +32,8 @@ const Input: React.FC<inputProps> = ({
   type = "text",
   className,
   inputRef,
+  onChange,
+  hidden,
   ...props
 }) => {
   const [inputType] = useState(type);
@@ -76,6 +80,8 @@ const Input: React.FC<inputProps> = ({
           readOnly={readOnly}
           autoComplete="off"
           ref={inputRef}
+          hidden={hidden}
+          onChange={onChange}
           {...props}
         />
       </div>

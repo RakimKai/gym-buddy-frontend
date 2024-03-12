@@ -3,16 +3,42 @@ import Button from "../Button/Button";
 import Input from "../Input/Input";
 import rootBG from "../../assets/rootBg.jpg";
 import { useNavigate } from "react-router-dom";
-import { axiosPrivate } from "../Axios/axios";
-import { RegisterRequest } from "../../types/Types";
+import { RegisterRequest } from "../../types/types";
 import { useRef } from "react";
+import { useMutation, useQuery } from "react-query";
+import { getUser, registerUser } from "../../data/auth/auth";
+import apiClient from "../Axios/axios";
+import { Bounce, ToastContainer, toast } from "react-toastify";
+import useAuth from "../../hooks/useContext";
 
 const Register = () => {
   const navigate = useNavigate();
+  const { setIsEmployee, setUser } = useAuth();
   const nameRef = useRef<HTMLInputElement>();
   const emailRef = useRef<HTMLInputElement>();
   const passwordRef = useRef<HTMLInputElement>();
   const passwordConfRef = useRef<HTMLInputElement>();
+
+  const { refetch } = useQuery("profile", getUser, {
+    enabled: false,
+    onSuccess({ data }) {
+      setUser(data.data.user);
+      setIsEmployee(data.data.user.role === "Employee");
+      navigate("/dashboard/user/home");
+    },
+  });
+
+  const { mutate: register } = useMutation(registerUser, {
+    async onSuccess({ data }) {
+      apiClient.defaults.headers.common.Authorization =
+        "Bearer " + data.data.token;
+      sessionStorage.setItem("token", data.data.token);
+      await refetch();
+    },
+    onError() {
+      toast("Nevalidni podaci.");
+    },
+  });
 
   const handleOnClick = async () => {
     const requestData: RegisterRequest = {
@@ -21,14 +47,7 @@ const Register = () => {
       password: passwordRef.current?.value,
       password_confirmation: passwordConfRef.current?.value,
     };
-
-    try {
-      const response = await axiosPrivate.post("/register", requestData);
-      localStorage.setItem("token", response.data.data.token);
-      navigate("/dashboard/user/home");
-    } catch (err) {
-      console.log(err);
-    }
+    register(requestData);
   };
 
   return (
@@ -36,6 +55,21 @@ const Register = () => {
       className="h-screen bg-white flex items-center justify-center bg-cover bg-center"
       style={{ backgroundImage: `url(${rootBG})` }}
     >
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
+      {/* Same as */}
+      <ToastContainer />
       <div className="flex h-auto w-full max-w-[34.75rem] flex-col rounded border border-gray-200 shadow-sm bg-white p-16">
         <div className="relative flex flex-col">
           <AuthHeader

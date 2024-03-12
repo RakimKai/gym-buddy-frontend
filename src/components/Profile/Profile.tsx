@@ -1,74 +1,105 @@
 import Button from "../Button/Button";
-import { useRef } from "react";
-import useAuth from "../../hooks/useContext";
+import { useRef, useState } from "react";
 import { useMutation } from "react-query";
 import { editUser } from "../../data/auth/auth";
-import { EditUser } from "../../types/Types";
+import { EditUser } from "../../types/types";
+import { Bounce, ToastContainer, toast } from "react-toastify";
+import Modal from "../Modal/Modal";
+import useAuth from "../../hooks/useContext";
+import { queryClient } from "../Layout/RootLayout";
 
 const Profile = () => {
-  const url = "../../public/profileImage.jpg";
   const nameRef = useRef<HTMLInputElement>(null);
-  const emailRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
+  const imageRef = useRef<HTMLInputElement>(null);
   const currentPasswordRef = useRef<HTMLInputElement>(null);
   const newPasswordRef = useRef<HTMLInputElement>(null);
 
+  const [shown, setShown] = useState<boolean>(false);
+  const { user } = useAuth();
+  const [imageUrl, setImageUrl] = useState<string>(
+    user?.image ?? "../../public/profileImage.jpg"
+  );
+  const [file, setFile] = useState<File | null>(null);
   const { mutate: updateUser, isLoading: updateUserLoading } = useMutation(
     editUser,
     {
       onSuccess() {
-        alert("gymra");
+        queryClient.invalidateQueries("user");
+        toast("Uspješno ste ažurirali profil!");
+      },
+      onError() {
+        toast("Invalid info.");
       },
     }
   );
 
-  const { user, setUser } = useAuth();
-
-  const handleClick = async () => {
+  const handleOnSave = async () => {
+    setShown(false);
     const editUser: EditUser = {
       name: nameRef.current?.value,
-      email: emailRef.current?.value,
       date_of_birth: dateRef.current?.value,
       phone_number: phoneRef.current?.value,
+      image: file as File,
       current_password: currentPasswordRef.current?.value,
       new_password: newPasswordRef.current?.value,
     };
     updateUser(editUser);
   };
-  console.log(user);
+
+  const handleOnClose = () => {
+    setShown(false);
+  };
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const file = e.target?.files[0];
+      setFile(e.target.files[0]);
+      setImageUrl(URL.createObjectURL(file));
+    }
+  };
+
   return (
     <div className="text-gray-700">
       <h2 className="text-2xl p-5">Postavke:</h2>
-      <div className="w-[75%] mx-auto mt-[50px] flex justify-between gap-x-5">
+      <div className="w-[75%] mx-auto mt-[100px] flex justify-between ">
         <div>
           <div
             className="w-48 h-48 bg-center cursor-pointer bg-cover rounded-full"
-            style={{ backgroundImage: `url(${url})` }}
+            style={{
+              backgroundImage: `url(${imageUrl})`,
+            }}
+            onClick={() => imageRef.current?.click()}
           ></div>
+          <input
+            type="file"
+            hidden
+            ref={imageRef}
+            onChange={(e: any) => handleImageChange(e)}
+          />
           <h3 className="font-medium text-sm mt-3">
             Promjeni profilnu fotografiju
           </h3>
         </div>
-        <div className="flex flex-col gap-y-4 w-1/5">
+        <div className="flex flex-col gap-y-4 w-1/5 ">
           <div className="grid grid-cols-2 items-center">
             <label>Ime: </label>
             <input
               ref={nameRef}
               defaultValue={user?.name}
               type="text"
-              className="w-[152px] outline-1 outline-gray-200 focus:outline-gray-200 px-3 py-2 border-2 border-gray-200 rounded"
-              placeholder="Ime i prezime..."
+              className="w-[152px] outline-1 outline-gray-200 ml-3 focus:outline-gray-200 px-3 py-2 border-2 border-gray-200 rounded"
+              placeholder="Ime..."
             />
           </div>
           <div className="grid grid-cols-2 items-center">
-            <label>Email: </label>
+            <label>Datum rodjenja: </label>
             <input
-              ref={emailRef}
-              defaultValue={user?.email}
+              defaultValue={user?.date_of_birth}
+              ref={dateRef}
               type="text"
-              className="w-[152px] outline-1 outline-gray-200 focus:outline-gray-200 px-3 py-2 border-2 border-gray-200 rounded"
-              placeholder="Email..."
+              className="w-[152px] outline-1 outline-gray-200 ml-3 focus:outline-gray-200 px-3 py-2 border-2 border-gray-200 rounded"
+              placeholder="Datum rodjenja..."
             />
           </div>
           <div className="grid grid-cols-2 items-center">
@@ -76,23 +107,13 @@ const Profile = () => {
             <input
               ref={phoneRef}
               defaultValue={user?.phone_number}
-              type="tel"
-              className="w-[152px] outline-1 outline-gray-200 focus:outline-gray-200 px-3 py-2 border-2 border-gray-200 rounded"
+              type="text"
+              className="w-[152px] outline-1 outline-gray-200 ml-3 focus:outline-gray-200 px-3 py-2 border-2 border-gray-200 rounded"
               placeholder="Broj telefona..."
             />
           </div>
         </div>
         <div className="flex flex-col gap-y-4">
-          <div className="grid grid-cols-2 items-center">
-            <label>Datum rodjenja: </label>
-            <input
-              ref={dateRef}
-              defaultValue={user?.date_of_birth}
-              type="text"
-              className="w-[152px] outline-1 outline-gray-200 focus:outline-gray-200 px-3 py-2 border-2 border-gray-200 rounded"
-              placeholder="Datum rodjenja..."
-            />
-          </div>
           <div className="grid grid-cols-2 items-center">
             <label>Trenutna lozinka: </label>
             <input
@@ -111,13 +132,34 @@ const Profile = () => {
               placeholder="Nova lozinka..."
             />
           </div>
+          <div className="flex justify-end w-[75%] ml-[75px] mt-[8px]">
+            <Button label="Sačuvaj" onClick={() => setShown(true)} />
+          </div>
         </div>
       </div>
-      <div className="flex justify-end w-[75%] mx-auto">
-        <Button
-          disabled={updateUserLoading}
-          label="Sačuvaj"
-          onClick={() => handleClick()}
+
+      {shown && (
+        <Modal onClose={() => handleOnClose()} open={true}>
+          <h2>Da li ste sigurni da želite sačuvati promjene?</h2>
+          <div className="flex gap-2 justify-end pt-6">
+            <Button label="Sačuvaj" onClick={() => handleOnSave()} />
+            <Button label="Zatvori" onClick={() => handleOnClose()} />
+          </div>
+        </Modal>
+      )}
+      <div className="absolute">
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          transition={Bounce}
         />
       </div>
     </div>
